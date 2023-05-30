@@ -1,0 +1,287 @@
+/*==============================================================*/
+/* DBMS name:      ORACLE Version 11g    - jtimana 2022   	        */
+/*==============================================================*/
+
+
+alter table CORRIDA
+   drop constraint FK_CORRIDA_CELEBRA_PLAZATOR;
+
+alter table PARTICIPA
+   drop constraint FK_PARTICIP_PARTICIPA_CORRIDA;
+
+alter table PARTICIPA
+   drop constraint FK_PARTICIP_PARTICIPA_TORERO;
+
+alter table PATROCINA
+   drop constraint FK_PATROCIN_PATROCINA_PATROCIN;
+
+alter table PATROCINA
+   drop constraint FK_PATROCIN_PATROCINA_CORRIDA;
+
+alter table PLAZATOROS
+   drop constraint FK_PLAZATOR_HAY_CIUDAD;
+
+alter table TORERO
+   drop constraint FK_TORERO_NACE_CIUDAD;
+
+alter table TORERO
+   drop constraint FK_TORERO_TIENE_APODERAD;
+
+alter table TORO
+   drop constraint FK_TORO_LIDEAN_CORRIDA;
+
+alter table TORO
+   drop constraint FK_TORO_PERTENECE_GANADERI;
+
+drop table APODERADO cascade constraints;
+
+drop table CIUDAD cascade constraints;
+
+drop index CELEBRA_FK;
+
+drop table CORRIDA cascade constraints;
+
+drop table GANADERIA cascade constraints;
+
+drop index PARTICIPA2_FK;
+
+drop index PARTICIPA_FK;
+
+drop table PARTICIPA cascade constraints;
+
+drop index PATROCINA2_FK;
+
+drop index PATROCINA_FK;
+
+drop table PATROCINA cascade constraints;
+
+drop table PATROCINADOR cascade constraints;
+
+drop index HAY_FK;
+
+drop table PLAZATOROS cascade constraints;
+
+drop index NACE_FK;
+
+drop index TIENE_FK;
+
+drop table TORERO cascade constraints;
+
+drop index PERTENECE_FK;
+
+drop index LIDEAN_FK;
+
+drop table TORO cascade constraints;
+
+/*==============================================================*/
+/* Table: APODERADO                                             */
+/*==============================================================*/
+create table APODERADO  (
+   APODID               INTEGER                         not null,
+   APONOMBRE            VARCHAR2(50)                    not null,
+   constraint PK_APODERADO primary key (APODID)
+);
+
+/*==============================================================*/
+/* Table: CIUDAD                                                */
+/*==============================================================*/
+create table CIUDAD  (
+   CIUID                INTEGER                         not null,
+   CIUNOMBRE            VARCHAR2(50)                    not null,
+   constraint PK_CIUDAD primary key (CIUID)
+);
+
+/*==============================================================*/
+/* Table: CORRIDA                                               */
+/*==============================================================*/
+create table CORRIDA  (
+   CORID                INTEGER                         not null,
+   CORNOMBRE            VARCHAR2(50)                    not null,
+   PLAZAID              INTEGER                         not null,
+   constraint PK_CORRIDA primary key (CORID)
+);
+
+/*==============================================================*/
+/* Index: CELEBRA_FK                                            */
+/*==============================================================*/
+create index CELEBRA_FK on CORRIDA (
+   PLAZAID ASC
+);
+
+/*==============================================================*/
+/* Table: GANADERIA                                             */
+/*==============================================================*/
+create table GANADERIA  (
+   GANID                INTEGER                         not null,
+   GANNOMBRE            VARCHAR2(50)                    not null,
+   constraint PK_GANADERIA primary key (GANID)
+);
+
+/*==============================================================*/
+/* Table: PARTICIPA                                             */
+/*==============================================================*/
+create table PARTICIPA  (
+   CORID                INTEGER                         not null,
+   TORID                INTEGER                         not null,
+   COR_FECHA            DATE                            not null,
+   constraint PK_PARTICIPA primary key (CORID, TORID)
+);
+
+/*==============================================================*/
+/* Index: PARTICIPA_FK                                          */
+/*==============================================================*/
+create index PARTICIPA_FK on PARTICIPA (
+   CORID ASC
+);
+
+/*==============================================================*/
+/* Index: PARTICIPA2_FK                                         */
+/*==============================================================*/
+create index PARTICIPA2_FK on PARTICIPA (
+   TORID ASC
+);
+
+/*==============================================================*/
+/* Table: PATROCINA                                             */
+/*==============================================================*/
+create table PATROCINA  (
+   PATID                INTEGER                         not null,
+   CORID                INTEGER                         not null,
+   constraint PK_PATROCINA primary key (PATID, CORID)
+);
+
+/*==============================================================*/
+/* Index: PATROCINA_FK                                          */
+/*==============================================================*/
+create index PATROCINA_FK on PATROCINA (
+   PATID ASC
+);
+
+/*==============================================================*/
+/* Index: PATROCINA2_FK                                         */
+/*==============================================================*/
+create index PATROCINA2_FK on PATROCINA (
+   CORID ASC
+);
+
+/*==============================================================*/
+/* Table: PATROCINADOR                                          */
+/*==============================================================*/
+create table PATROCINADOR  (
+   PATID                INTEGER                         not null,
+   PATNOMBRE            VARCHAR2(50)                    not null,
+   PATTIPO              VARCHAR2(50)                    not null
+      constraint CKC_PATTIPO_PATROCIN check (PATTIPO in ('dinero','especie')),
+   constraint PK_PATROCINADOR primary key (PATID)
+);
+
+/*==============================================================*/
+/* Table: PLAZATOROS                                            */
+/*==============================================================*/
+create table PLAZATOROS  (
+   PLAZAID              INTEGER                         not null,
+   PLAZANOMBRE          VARCHAR2(30)                    not null,
+   CIUID                INTEGER                         not null,
+   constraint PK_PLAZATOROS primary key (PLAZAID)
+);
+
+/*==============================================================*/
+/* Index: HAY_FK                                                */
+/*==============================================================*/
+create index HAY_FK on PLAZATOROS (
+   CIUID ASC
+);
+
+/*==============================================================*/
+/* Table: TORERO                                                */
+/*==============================================================*/
+create table TORERO  (
+   TORID                INTEGER                         not null,
+   TORNOMBRE            VARCHAR2(50)                    not null,
+   TORAPODO             VARCHAR2(30)                    not null,
+   CIUID                INTEGER                         not null,
+   APODID               INTEGER,
+   constraint PK_TORERO primary key (TORID)
+);
+
+/*==============================================================*/
+/* Index: TIENE_FK                                              */
+/*==============================================================*/
+create index TIENE_FK on TORERO (
+   APODID ASC
+);
+
+/*==============================================================*/
+/* Index: NACE_FK                                               */
+/*==============================================================*/
+create index NACE_FK on TORERO (
+   CIUID ASC
+);
+
+/*==============================================================*/
+/* Table: TORO                                                  */
+/*==============================================================*/
+create table TORO  (
+   TOROID               INTEGER                         not null,
+   TORONOMBRE           VARCHAR2(50)                    not null,
+   TOROPESO             INTEGER                         not null,
+   TORORAZA             VARCHAR2(50)                    not null,
+   CORID                INTEGER,
+   GANID                INTEGER                         not null,
+   constraint PK_TORO primary key (TOROID)
+);
+
+/*==============================================================*/
+/* Index: LIDEAN_FK                                             */
+/*==============================================================*/
+create index LIDEAN_FK on TORO (
+   CORID ASC
+);
+
+/*==============================================================*/
+/* Index: PERTENECE_FK                                          */
+/*==============================================================*/
+create index PERTENECE_FK on TORO (
+   GANID ASC
+);
+
+alter table CORRIDA
+   add constraint FK_CORRIDA_CELEBRA_PLAZATOR foreign key (PLAZAID)
+      references PLAZATOROS (PLAZAID);
+
+alter table PARTICIPA
+   add constraint FK_PARTICIP_PARTICIPA_CORRIDA foreign key (CORID)
+      references CORRIDA (CORID);
+
+alter table PARTICIPA
+   add constraint FK_PARTICIP_PARTICIPA_TORERO foreign key (TORID)
+      references TORERO (TORID);
+
+alter table PATROCINA
+   add constraint FK_PATROCIN_PATROCINA_PATROCIN foreign key (PATID)
+      references PATROCINADOR (PATID);
+
+alter table PATROCINA
+   add constraint FK_PATROCIN_PATROCINA_CORRIDA foreign key (CORID)
+      references CORRIDA (CORID);
+
+alter table PLAZATOROS
+   add constraint FK_PLAZATOR_HAY_CIUDAD foreign key (CIUID)
+      references CIUDAD (CIUID);
+
+alter table TORERO
+   add constraint FK_TORERO_NACE_CIUDAD foreign key (CIUID)
+      references CIUDAD (CIUID);
+
+alter table TORERO
+   add constraint FK_TORERO_TIENE_APODERAD foreign key (APODID)
+      references APODERADO (APODID);
+
+alter table TORO
+   add constraint FK_TORO_LIDEAN_CORRIDA foreign key (CORID)
+      references CORRIDA (CORID);
+
+alter table TORO
+   add constraint FK_TORO_PERTENECE_GANADERI foreign key (GANID)
+      references GANADERIA (GANID);
+
